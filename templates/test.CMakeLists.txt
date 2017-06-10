@@ -1,0 +1,24 @@
+include(cmake-utils/utils.cmake)
+include(cmake-utils/coverage.cmake)
+include(cmake-utils/sanitizers.cmake)
+
+if(COVERAGE)
+    add_coverage_flags()
+endif()
+
+if(SANITIZERS)
+    add_sanitizers_flags()
+endif()
+
+add_executable(${PROJECT_NAME}-tests EXCLUDE_FROM_ALL main.cpp)
+
+add_run_target(${PROJECT_NAME}-tests tests-run)
+
+if(NOT SANITIZERS)
+    add_valgrind_target(${PROJECT_NAME} tests-valgrind)
+endif()
+
+if(COVERAGE)
+    add_coverage_targets(${PROJECT_NAME} tests-run tests)
+endif()
+
