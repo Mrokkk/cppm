@@ -5,7 +5,7 @@ import sys
 import shutil
 import argparse
 
-BASE_DIR = os.path.dirname(sys.argv[0])
+BASE_DIR = os.path.dirname(os.readlink(sys.argv[0]))
 
 def create_dir(name):
     if not os.path.exists(name):
