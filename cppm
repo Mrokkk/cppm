@@ -4,6 +4,7 @@ import os
 import sys
 import shutil
 import argparse
+from string import Template
 
 BASE_DIR = os.path.dirname(os.readlink(sys.argv[0]))
 
@@ -15,6 +16,22 @@ def read_file(name):
     with open(name, "r") as f:
         return f.read()
 
+def install_test_framework(name):
+    test_include = None
+    print('Adding {} test framework'.format(name))
+    if name == 'yatf':
+        os.system('git submodule add https://github.com/Mrokkk/yatf.git test/yatf')
+        test_include = 'yatf/include'
+    elif name == 'catch':
+        os.system('git submodule add https://github.com/philsquared/Catch.git test/Catch')
+        test_include = 'Catch/single_include'
+    elif name == 'none':
+        test_include = '' # FIXME
+    test_cmake = Template(read_file(BASE_DIR + '/templates/test.CMakeLists.txt')).substitute(test_include=test_include)
+    with open('test/CMakeLists.txt', 'w') as f:
+        f.write(test_cmake)
+    shutil.copy(BASE_DIR + '/templates/{}.main.cpp'.format(name), 'test/main.cpp')
+
 def init_project(args):
     print('Initializing {}'.format(args.name))
     os.system('git init')
@@ -25,13 +42,13 @@ def init_project(args):
         f.write(read_file(BASE_DIR + '/templates/CMakeLists.txt'))
     shutil.copy(BASE_DIR + '/templates/src.CMakeLists.txt', 'src/CMakeLists.txt')
     shutil.copy(BASE_DIR + '/templates/src.main.cpp', 'src/main.cpp')
-    shutil.copy(BASE_DIR + '/templates/test.main.cpp', 'test/main.cpp')
-    shutil.copy(BASE_DIR + '/templates/test.CMakeLists.txt', 'test/CMakeLists.txt')
     os.system('git submodule add https://github.com/Mrokkk/cmake-utils.git test/cmake-utils')
+    install_test_framework(args.test_framework)
 
 def add_init_command(subparsers):
     parser_share = subparsers.add_parser('init')
     parser_share.add_argument('name')
+    parser_share.add_argument('-t', '--test-framework', choices=['yatf', 'catch', 'none'], default='yatf')
     parser_share.set_defaults(func=init_project)
 
 def main():
