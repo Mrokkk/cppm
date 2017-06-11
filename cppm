@@ -1,16 +1,16 @@
 #!/usr/bin/python3
 
-import os
-import sys
-import shutil
-import argparse
+from sys import argv
+from shutil import copy
 from string import Template
+from argparse import ArgumentParser
+from os import makedirs, path, readlink, system
 
-BASE_DIR = os.path.dirname(os.readlink(sys.argv[0]))
+BASE_DIR = path.dirname(readlink(argv[0]))
 
 def create_dir(name):
-    if not os.path.exists(name):
-        os.makedirs(name)
+    if not path.exists(name):
+        makedirs(name)
 
 def read_file(name):
     with open(name, "r") as f:
@@ -20,10 +20,10 @@ def install_test_framework(name):
     test_include = None
     print('Adding {} test framework'.format(name))
     if name == 'yatf':
-        os.system('git submodule add https://github.com/Mrokkk/yatf.git test/yatf')
+        system('git submodule add https://github.com/Mrokkk/yatf.git test/yatf')
         test_include = 'yatf/include'
     elif name == 'catch':
-        os.system('git submodule add https://github.com/philsquared/Catch.git test/Catch')
+        system('git submodule add https://github.com/philsquared/Catch.git test/Catch')
         test_include = 'Catch/single_include'
     elif name == 'none':
         test_include = '' # FIXME
@@ -34,7 +34,7 @@ def install_test_framework(name):
 
 def init_project(args):
     print('Initializing {}'.format(args.name))
-    os.system('git init')
+    system('git init')
     create_dir('src')
     create_dir('test')
     with open('CMakeLists.txt', 'w') as f:
@@ -42,7 +42,7 @@ def init_project(args):
         f.write(read_file(BASE_DIR + '/templates/CMakeLists.txt'))
     shutil.copy(BASE_DIR + '/templates/src.CMakeLists.txt', 'src/CMakeLists.txt')
     shutil.copy(BASE_DIR + '/templates/src.main.cpp', 'src/main.cpp')
-    os.system('git submodule add https://github.com/Mrokkk/cmake-utils.git test/cmake-utils')
+    system('git submodule add https://github.com/Mrokkk/cmake-utils.git test/cmake-utils')
     install_test_framework(args.test_framework)
 
 def add_init_command(subparsers):
@@ -52,7 +52,7 @@ def add_init_command(subparsers):
     parser_share.set_defaults(func=init_project)
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = ArgumentParser()
     subparsers = parser.add_subparsers(help='sub-command help')
     add_init_command(subparsers)
     args = parser.parse_args()
