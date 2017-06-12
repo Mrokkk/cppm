@@ -17,20 +17,18 @@ def read_file(name):
         return f.read()
 
 def install_test_framework(name):
-    test_include = None
+    test_include = '${CMAKE_SOURCE_DIR}/src '
     print('Adding {} test framework'.format(name))
     if name == 'yatf':
         system('git submodule add https://github.com/Mrokkk/yatf.git test/yatf')
-        test_include = 'yatf/include'
+        test_include += 'yatf/include'
     elif name == 'catch':
         system('git submodule add https://github.com/philsquared/Catch.git test/Catch')
-        test_include = 'Catch/single_include'
-    elif name == 'none':
-        test_include = '' # FIXME
+        test_include += 'Catch/single_include'
     test_cmake = Template(read_file(BASE_DIR + '/templates/test.CMakeLists.txt')).substitute(test_include=test_include)
     with open('test/CMakeLists.txt', 'w') as f:
         f.write(test_cmake)
-    shutil.copy(BASE_DIR + '/templates/{}.main.cpp'.format(name), 'test/main.cpp')
+    copy(BASE_DIR + '/templates/{}.main.cpp'.format(name), 'test/main.cpp')
 
 def init_project(args):
     print('Initializing {}'.format(args.name))
@@ -40,8 +38,8 @@ def init_project(args):
     with open('CMakeLists.txt', 'w') as f:
         f.write('project({} CXX)\n'.format(args.name))
         f.write(read_file(BASE_DIR + '/templates/CMakeLists.txt'))
-    shutil.copy(BASE_DIR + '/templates/src.CMakeLists.txt', 'src/CMakeLists.txt')
-    shutil.copy(BASE_DIR + '/templates/src.main.cpp', 'src/main.cpp')
+    copy(BASE_DIR + '/templates/src.CMakeLists.txt', 'src/CMakeLists.txt')
+    copy(BASE_DIR + '/templates/src.main.cpp', 'src/main.cpp')
     system('git submodule add https://github.com/Mrokkk/cmake-utils.git test/cmake-utils')
     install_test_framework(args.test_framework)
 
