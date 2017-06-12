@@ -49,10 +49,28 @@ def add_init_command(subparsers):
     parser_share.add_argument('-t', '--test-framework', choices=['yatf', 'catch', 'none'], default='yatf')
     parser_share.set_defaults(func=init_project)
 
+def run_project(args):
+    # TODO
+    pass
+
+def add_run_command(subparsers):
+    parser_share = subparsers.add_parser('run')
+    parser_share.set_defaults(func=run_project)
+
+def test_project(args):
+    create_dir('build')
+    system('cd build; cmake .. && make tests-run -j$(nproc)')
+
+def add_test_command(subparsers):
+    parser_share = subparsers.add_parser('test')
+    parser_share.set_defaults(func=test_project)
+
 def main():
     parser = ArgumentParser()
     subparsers = parser.add_subparsers(help='sub-command help')
     add_init_command(subparsers)
+    add_run_command(subparsers)
+    add_test_command(subparsers)
     args = parser.parse_args()
     args.func(args)
 
