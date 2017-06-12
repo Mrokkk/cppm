@@ -50,8 +50,12 @@ def add_init_command(subparsers):
     parser_share.set_defaults(func=init_project)
 
 def run_project(args):
-    # TODO
-    pass
+    create_dir('build')
+    project_name = None
+    with open('CMakeLists.txt', 'r') as f:
+        line = f.readline()
+        project_name = line[line.index('(') + 1:line.rindex(')')].split()[0]
+    system('cd build; cmake .. && make {} && ./src/{}'.format(project_name, project_name))
 
 def add_run_command(subparsers):
     parser_share = subparsers.add_parser('run')
