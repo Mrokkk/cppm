@@ -31,6 +31,6 @@ if(NOT SANITIZERS)
 endif()
 
 if(COVERAGE)
-    add_coverage_targets($${PROJECT_NAME} tests-run tests)
+    add_coverage_targets($${PROJECT_NAME}-tests tests-run tests $${CMAKE_SOURCE_DIR}/src)
 endif()
 
