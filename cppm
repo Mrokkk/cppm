@@ -13,7 +13,7 @@ def create_dir(name):
         makedirs(name)
 
 def read_file(name):
-    with open(name, "r") as f:
+    with open(name, 'r') as f:
         return f.read()
 
 def install_test_framework(name):
@@ -78,7 +78,7 @@ def main():
     args = parser.parse_args()
     args.func(args)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
 
 # vim: filetype=python
